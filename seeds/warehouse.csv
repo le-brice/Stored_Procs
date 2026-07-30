@@ -2,10 +2,3 @@ WarehouseId,WarehouseCode,WarehouseName,CountryCode,IsActive
 1,WH01,Primary DC - NJ,US,1
 2,WH02,UK DC - Reading,GB,1
 3,WH03,Returns Center - OH,US,0
-4,WH04,EU DC - Rotterdam,NL,1
-5,WH05,DE DC - Hamburg,DE,1
-6,WH06,West DC - Reno,US,1
-7,WH07,Canada DC - Mississauga,CA,1
-8,WH08,APAC DC - Singapore,SG,1
-9,WH09,Nordics DC - Malmo,SE,1
-10,WH10,Overflow - Dayton,US,0
