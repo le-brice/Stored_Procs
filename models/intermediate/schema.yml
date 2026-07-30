@@ -1,0 +1,187 @@
+version: 2
+
+models:
+  - name: int_config_values
+    description: "Intermediate transformation that prepares config values for downstream marts."
+    columns:
+      - name: default_warehouse_code
+        description: "Default warehouse code for this model."
+      - name: default_reorder_point
+        description: "Default reorder point for this model."
+      - name: default_reorder_qty
+        description: "Default reorder qty for this model."
+      - name: recon_tolerance
+        description: "Recon tolerance for this model."
+
+  - name: int_customer_master
+    description: "Intermediate transformation that prepares customer master for downstream marts."
+    columns:
+      - name: customer_id
+        description: "Customer identifier used to join customer and order models."
+      - name: customer_no
+        description: "External customer business key."
+      - name: first_name
+        description: "Customer first name."
+      - name: last_name
+        description: "Customer last name."
+      - name: email
+        description: "Customer email address."
+      - name: phone
+        description: "Customer phone number."
+      - name: country_code
+        description: "Customer country code."
+      - name: status
+        description: "Customer status."
+
+  - name: int_fx_rates
+    description: "Intermediate transformation that prepares fx rates for downstream marts."
+    columns:
+      - name: from_currency
+        description: "From currency for this model."
+      - name: to_currency
+        description: "To currency for this model."
+      - name: rate_date
+        description: "Rate date for this model."
+      - name: rate
+        description: "Rate for this model."
+
+  - name: int_order_line_inputs
+    description: "Intermediate transformation that prepares order line inputs for downstream marts."
+    columns:
+      - name: row_id
+        description: "Deterministic row identifier assigned to raw feed records."
+      - name: external_order_ref
+        description: "External source-system order reference."
+      - name: customer_id
+        description: "Customer identifier used to join customer and order models."
+      - name: order_date
+        description: "Date associated with the order."
+      - name: product_id
+        description: "Product identifier used to join product and order models."
+      - name: qty
+        description: "Ordered or inventory quantity."
+      - name: unit_price
+        description: "Unit price in the row currency."
+      - name: base_tax_rate
+        description: "Base tax rate for this model."
+      - name: tax_rate
+        description: "Tax rate applied to the order line."
+
+  - name: int_order_promotions
+    description: "Intermediate transformation that prepares order promotions for downstream marts."
+    columns:
+      - name: external_order_ref
+        description: "External source-system order reference."
+      - name: promotion_id
+        description: "Promotion id for this model."
+      - name: invalid_reason
+        description: "Invalid reason for this model."
+      - name: discount_total
+        description: "Discount amount allocated to the model grain."
+
+  - name: int_order_usd_rates
+    description: "Intermediate transformation that prepares order usd rates for downstream marts."
+    columns:
+      - name: order_id
+        description: "Deterministic dbt-generated order identifier."
+      - name: usd_rate
+        description: "Usd rate for this model."
+
+  - name: int_product_categories
+    description: "Intermediate transformation that prepares product categories for downstream marts."
+    columns:
+      - name: category_id
+        description: "Product category identifier."
+      - name: category_name
+        description: "Category name for this model."
+      - name: parent_category_id
+        description: "Parent product category identifier."
+      - name: default_margin_pct
+        description: "Default category margin percentage."
+
+  - name: int_product_master
+    description: "Intermediate transformation that prepares product master for downstream marts."
+    columns:
+      - name: product_id
+        description: "Product identifier used to join product and order models."
+      - name: sku
+        description: "Product stock keeping unit."
+      - name: product_name
+        description: "Product display name."
+      - name: category_id
+        description: "Product category identifier."
+      - name: supplier_id
+        description: "Supplier identifier associated with the product."
+      - name: unit_cost
+        description: "Product unit cost in the base currency."
+      - name: list_price
+        description: "Product list price in the base currency."
+      - name: weight_g
+        description: "Product weight in grams."
+      - name: status
+        description: "Product status."
+
+  - name: int_raw_orders_validated
+    description: "Raw order feed rows with deterministic reject reasons from etl.usp_ImportRawOrders pre-flight checks."
+    columns:
+      - name: row_id
+        description: "Deterministic row identifier assigned to raw feed records."
+        tests:
+          - not_null
+          - unique
+      - name: external_order_ref
+        description: "External source-system order reference."
+      - name: customer_no
+        description: "External customer business key."
+      - name: customer_id
+        description: "Customer identifier used to join customer and order models."
+      - name: order_date
+        description: "Date associated with the order."
+      - name: sku
+        description: "Product stock keeping unit."
+      - name: product_id
+        description: "Product identifier used to join product and order models."
+      - name: qty
+        description: "Ordered or inventory quantity."
+      - name: unit_price
+        description: "Unit price in the row currency."
+      - name: promo_code
+        description: "Promo code for this model."
+      - name: currency_code
+        description: "ISO currency code for monetary amounts."
+      - name: source_system
+        description: "Source system for this model."
+      - name: reject_reason
+        description: "Reason a raw feed row failed validation, if any."
+
+  - name: int_suppliers
+    description: "Intermediate transformation that prepares suppliers for downstream marts."
+    columns:
+      - name: supplier_id
+        description: "Supplier identifier associated with the product."
+      - name: supplier_name
+        description: "Supplier name for this model."
+      - name: country_code
+        description: "Supplier country code."
+      - name: lead_time_days
+        description: "Expected supplier lead time in days."
+      - name: is_active
+        description: "Flag indicating whether the supplier is active."
+
+  - name: int_valid_order_refs
+    description: "Intermediate transformation that prepares valid order refs for downstream marts."
+    columns:
+      - name: external_order_ref
+        description: "External source-system order reference."
+      - name: customer_no
+        description: "External customer business key."
+      - name: customer_id
+        description: "Customer identifier used to join customer and order models."
+      - name: order_date
+        description: "Date associated with the order."
+      - name: currency_code
+        description: "ISO currency code for monetary amounts."
+      - name: promo_code
+        description: "Promo code for this model."
+      - name: source_system
+        description: "Source system for this model."

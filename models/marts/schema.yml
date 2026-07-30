@@ -1,0 +1,285 @@
+version: 2
+
+models:
+  - name: fct_order_lines
+    description: "Deterministic order line facts, including imported unit price overrides, tax rates, and merged duplicate product lines."
+    columns:
+      - name: order_line_id
+        description: "Deterministic dbt-generated order line identifier."
+        tests:
+          - not_null
+          - unique
+      - name: order_id
+        description: "Deterministic dbt-generated order identifier."
+        tests:
+          - relationships:
+              arguments:
+                to: ref('fct_orders')
+                field: order_id
+      - name: line_no
+        description: "Line number within the order."
+      - name: product_id
+        description: "Product identifier used to join product and order models."
+        tests:
+          - not_null
+      - name: qty
+        description: "Ordered or inventory quantity."
+        tests:
+          - not_null
+      - name: unit_price
+        description: "Unit price in the row currency."
+      - name: line_discount
+        description: "Discount amount applied to the order line."
+      - name: tax_rate
+        description: "Tax rate applied to the order line."
+      - name: line_tax
+        description: "Tax amount applied to the order line."
+      - name: line_total
+        description: "Final line amount after discount and tax."
+
+  - name: fct_orders
+    description: "Deterministic order headers derived from clean raw order groups, replacing the procedural create/import/confirm flow for analytics."
+    columns:
+      - name: order_id
+        description: "Deterministic dbt-generated order identifier."
+        tests:
+          - not_null
+          - unique
+      - name: order_no
+        description: "Human-readable generated order number."
+      - name: external_order_ref
+        description: "External source-system order reference."
+        tests:
+          - not_null
+          - unique
+      - name: customer_id
+        description: "Customer identifier used to join customer and order models."
+        tests:
+          - not_null
+      - name: order_date
+        description: "Date associated with the order."
+      - name: status
+        description: "Business status for the record."
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["CONFIRMED", "PAID", "SHIPPED", "COMPLETED", "CANCELLED", "NEW", "ONHOLD"]
+      - name: currency_code
+        description: "ISO currency code for monetary amounts."
+      - name: promotion_id
+        description: "Promotion id for this model."
+      - name: subtotal
+        description: "Gross order amount before header-level discounts and tax."
+      - name: discount_total
+        description: "Discount amount allocated to the model grain."
+      - name: tax_total
+        description: "Total tax amount at the model grain."
+      - name: shipping_total
+        description: "Shipping total for this model."
+      - name: grand_total
+        description: "Final order amount after discounts, tax, and shipping."
+        tests:
+          - not_null
+      - name: warehouse_id
+        description: "Warehouse identifier associated with inventory or fulfilment."
+      - name: source_system
+        description: "Source system for this model."
+      - name: promo_reject_reason
+        description: "Reason a promotion was not applied, if any."
+
+  - name: fct_journal_balance
+    description: "Journal balance check by entry date and source."
+    columns:
+      - name: entry_date
+        description: "Accounting entry date."
+        tests:
+          - not_null
+      - name: source
+        description: "Source process or business domain for the row."
+        tests:
+          - not_null
+      - name: debit_amount
+        description: "Debit amount for the journal line."
+      - name: credit_amount
+        description: "Credit amount for the journal line."
+      - name: variance_amount
+        description: "Variance amount for this model."
+      - name: is_balanced
+        description: "Boolean flag indicating whether debits equal credits."
+        tests:
+          - accepted_values:
+              arguments:
+                values: [true]
+
+  - name: fct_sales_journal_lines
+    description: "Generated sales journal lines in USD, replacing fin.usp_GenerateSalesJournal for analytics."
+    columns:
+      - name: journal_line_key
+        description: "Stable surrogate key for a generated journal line."
+        tests:
+          - not_null
+          - unique
+      - name: entry_date
+        description: "Accounting entry date."
+        tests:
+          - not_null
+      - name: source
+        description: "Source process or business domain for the row."
+      - name: description
+        description: "Description for this model."
+      - name: gl_account_id
+        description: "General ledger account identifier."
+      - name: account_code
+        description: "General ledger account code."
+        tests:
+          - not_null
+      - name: debit_amount
+        description: "Debit amount for the journal line."
+      - name: credit_amount
+        description: "Credit amount for the journal line."
+
+  - name: rpt_inventory_snapshot
+    description: "Current stock snapshot and reorder flag logic replacing rpt.usp_BuildInventorySnapshot."
+    columns:
+      - name: snapshot_date
+        description: "Date grain for the inventory snapshot."
+        tests:
+          - not_null
+      - name: warehouse_id
+        description: "Warehouse identifier associated with inventory or fulfilment."
+        tests:
+          - not_null
+      - name: product_id
+        description: "Product identifier used to join product and order models."
+        tests:
+          - not_null
+      - name: qty_on_hand
+        description: "Inventory units physically on hand."
+      - name: qty_allocated
+        description: "Inventory units allocated to demand."
+      - name: qty_available
+        description: "Inventory units available after allocations."
+      - name: stock_value
+        description: "Stock value for this model."
+      - name: below_reorder
+        description: "Flag for inventory at or below reorder threshold."
+
+  - name: rpt_low_stock_report
+    description: "Low-stock purchasing view based on the dbt inventory snapshot."
+    columns:
+      - name: warehouse_id
+        description: "Warehouse identifier associated with inventory or fulfilment."
+        tests:
+          - not_null
+      - name: product_id
+        description: "Product identifier used to join product and order models."
+        tests:
+          - not_null
+      - name: sku
+        description: "Product stock keeping unit."
+      - name: product_name
+        description: "Product name for this model."
+      - name: supplier_name
+        description: "Supplier name for this model."
+      - name: qty_available
+        description: "Inventory units available after allocations."
+      - name: on_order
+        description: "On order for this model."
+
+  - name: rpt_reorder_recommendations
+    description: "Reorder recommendations by warehouse, supplier, and product using configured or default reorder thresholds."
+    columns:
+      - name: warehouse_id
+        description: "Warehouse identifier associated with inventory or fulfilment."
+        tests:
+          - not_null
+      - name: supplier_id
+        description: "Supplier identifier associated with the product."
+        tests:
+          - not_null
+      - name: product_id
+        description: "Product identifier used to join product and order models."
+        tests:
+          - not_null
+      - name: recommended_order_qty
+        description: "Recommended replenishment quantity."
+      - name: unit_cost
+        description: "Unit cost for this model."
+      - name: estimated_cost
+        description: "Estimated cost for this model."
+
+  - name: rpt_customer_ltv
+    description: "Customer LTV mart with USD conversion, recency score, and VIP/LAPSED/NEW/REGULAR segmentation from rpt.usp_BuildCustomerLtv."
+    columns:
+      - name: customer_id
+        description: "Customer identifier used to join customer and order models."
+        tests:
+          - not_null
+          - unique
+      - name: first_order_date
+        description: "First order date for this model."
+      - name: last_order_date
+        description: "Last order date for this model."
+      - name: order_count
+        description: "Order count for this model."
+      - name: total_net_spend
+        description: "Total net spend for this model."
+      - name: avg_order_value
+        description: "Avg order value for this model."
+      - name: ltv_score
+        description: "Ltv score for this model."
+      - name: segment
+        description: "Customer LTV segment derived from spend and recency."
+        tests:
+          - accepted_values:
+              arguments:
+                values: ["VIP", "REGULAR", "LAPSED", "NEW"]
+
+  - name: rpt_daily_sales_summary
+    description: "Daily sales mart at date, warehouse, and category grain, replacing rpt.usp_BuildDailySales."
+    columns:
+      - name: summary_date
+        description: "Date grain for the summary row."
+        tests:
+          - not_null
+      - name: warehouse_id
+        description: "Warehouse identifier associated with inventory or fulfilment."
+        tests:
+          - not_null
+      - name: category_id
+        description: "Product category identifier."
+        tests:
+          - not_null
+      - name: order_count
+        description: "Order count for this model."
+      - name: units_sold
+        description: "Units sold for this model."
+      - name: gross_revenue
+        description: "Revenue before discounts at the model grain."
+      - name: discount_total
+        description: "Discount amount allocated to the model grain."
+      - name: net_revenue
+        description: "Revenue after discounts at the model grain."
+      - name: est_margin
+        description: "Est margin for this model."
+
+  - name: rpt_top_products_by_revenue
+    description: "Product-grain revenue mart replacing rpt.usp_TopProductsByRevenue and intentionally fixing the legacy category-as-product fallback bug."
+    columns:
+      - name: product_id
+        description: "Product identifier used to join product and order models."
+        tests:
+          - not_null
+          - unique
+      - name: product_name
+        description: "Product name for this model."
+      - name: category_id
+        description: "Product category identifier."
+      - name: net_revenue
+        description: "Revenue after discounts at the model grain."
+      - name: units_sold
+        description: "Units sold for this model."
+      - name: first_order_date
+        description: "First order date for this model."
+      - name: last_order_date
+        description: "Last order date for this model."

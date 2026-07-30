@@ -1,0 +1,330 @@
+version: 2
+
+models:
+  - name: stg_config_param
+    description: "Clean, typed staging view for config param seed data."
+    columns:
+      - name: param_key
+        description: "Param key for this model."
+      - name: param_value
+        description: "Param value for this model."
+      - name: param_type
+        description: "Param type for this model."
+      - name: description
+        description: "Description for this model."
+
+  - name: stg_customer_addresses
+    description: "Clean, typed staging view for customer addresses seed data."
+    columns:
+      - name: address_id
+        description: "Address id for this model."
+      - name: customer_id
+        description: "Customer identifier used to join customer and order models."
+      - name: address_type
+        description: "Address type for this model."
+      - name: line1
+        description: "Line1 for this model."
+      - name: line2
+        description: "Line2 for this model."
+      - name: city
+        description: "City for this model."
+      - name: post_code
+        description: "Post code for this model."
+      - name: country_code
+        description: "Country code for this model."
+      - name: is_default
+        description: "Is default for this model."
+
+  - name: stg_customers
+    description: "Clean, typed staging view for customers seed data."
+    columns:
+      - name: customer_id
+        description: "Customer identifier used to join customer and order models."
+      - name: customer_no
+        description: "External customer business key."
+      - name: first_name
+        description: "First name for this model."
+      - name: last_name
+        description: "Last name for this model."
+      - name: email
+        description: "Email for this model."
+      - name: phone
+        description: "Phone for this model."
+      - name: country_code
+        description: "Country code for this model."
+      - name: status
+        description: "Business status for the record."
+
+  - name: stg_gl_accounts
+    description: "Clean, typed staging view for gl accounts seed data."
+    columns:
+      - name: gl_account_id
+        description: "General ledger account identifier."
+      - name: account_code
+        description: "General ledger account code."
+      - name: account_name
+        description: "Account name for this model."
+      - name: account_type
+        description: "Account type for this model."
+      - name: is_active
+        description: "Is active for this model."
+
+  - name: stg_loyalty_accounts
+    description: "Clean, typed staging view for loyalty accounts seed data."
+    columns:
+      - name: loyalty_account_id
+        description: "Loyalty account id for this model."
+      - name: customer_id
+        description: "Customer identifier used to join customer and order models."
+      - name: tier
+        description: "Tier for this model."
+      - name: points_balance
+        description: "Points balance for this model."
+      - name: lifetime_points
+        description: "Lifetime points for this model."
+
+  - name: stg_price_list_items
+    description: "Clean, typed staging view for price list items seed data."
+    columns:
+      - name: price_list_item_id
+        description: "Price list item id for this model."
+      - name: price_list_id
+        description: "Price list id for this model."
+      - name: product_id
+        description: "Product identifier used to join product and order models."
+      - name: unit_price
+        description: "Unit price in the row currency."
+
+  - name: stg_price_lists
+    description: "Clean, typed staging view for price lists seed data."
+    columns:
+      - name: price_list_id
+        description: "Price list id for this model."
+      - name: price_list_name
+        description: "Price list name for this model."
+      - name: currency_code
+        description: "ISO currency code for monetary amounts."
+      - name: effective_from
+        description: "Effective from for this model."
+      - name: effective_to
+        description: "Effective to for this model."
+      - name: is_active
+        description: "Is active for this model."
+
+  - name: stg_product_categories
+    description: "Clean, typed staging view for product categories seed data."
+    columns:
+      - name: category_id
+        description: "Product category identifier."
+      - name: category_name
+        description: "Category name for this model."
+      - name: parent_category_id
+        description: "Parent category id for this model."
+      - name: default_margin_pct
+        description: "Default margin pct for this model."
+
+  - name: stg_products
+    description: "Clean, typed staging view for products seed data."
+    columns:
+      - name: product_id
+        description: "Product identifier used to join product and order models."
+      - name: sku
+        description: "Product stock keeping unit."
+      - name: product_name
+        description: "Product name for this model."
+      - name: category_id
+        description: "Product category identifier."
+      - name: supplier_id
+        description: "Supplier identifier associated with the product."
+      - name: unit_cost
+        description: "Unit cost for this model."
+      - name: list_price
+        description: "List price for this model."
+      - name: weight_g
+        description: "Weight g for this model."
+      - name: status
+        description: "Business status for the record."
+
+  - name: stg_promotions
+    description: "Clean, typed staging view for promotions seed data."
+    columns:
+      - name: promotion_id
+        description: "Promotion id for this model."
+      - name: promo_code
+        description: "Promo code for this model."
+      - name: description
+        description: "Description for this model."
+      - name: promo_type
+        description: "Promo type for this model."
+      - name: discount_pct
+        description: "Discount pct for this model."
+      - name: discount_amt
+        description: "Discount amt for this model."
+      - name: min_spend
+        description: "Min spend for this model."
+      - name: category_id
+        description: "Product category identifier."
+      - name: effective_from
+        description: "Effective from for this model."
+      - name: effective_to
+        description: "Effective to for this model."
+      - name: max_redemptions
+        description: "Max redemptions for this model."
+      - name: is_active
+        description: "Is active for this model."
+      - name: times_redeemed
+        description: "Times redeemed for this model."
+
+  - name: stg_raw_customers
+    description: "Clean, typed staging view for raw customers seed data."
+    columns:
+      - name: row_id
+        description: "Deterministic row identifier assigned to raw feed records."
+      - name: customer_no
+        description: "External customer business key."
+      - name: first_name
+        description: "First name for this model."
+      - name: last_name
+        description: "Last name for this model."
+      - name: email
+        description: "Email for this model."
+      - name: phone
+        description: "Phone for this model."
+      - name: country_raw
+        description: "Country raw for this model."
+
+  - name: stg_raw_fx_rates
+    description: "Clean, typed staging view for raw fx rates seed data."
+    columns:
+      - name: row_id
+        description: "Deterministic row identifier assigned to raw feed records."
+      - name: from_currency
+        description: "From currency for this model."
+      - name: to_currency
+        description: "To currency for this model."
+      - name: rate_date
+        description: "Rate date for this model."
+      - name: rate
+        description: "Rate for this model."
+
+  - name: stg_raw_orders
+    description: "Clean, typed staging view for raw orders seed data."
+    columns:
+      - name: row_id
+        description: "Deterministic row identifier assigned to raw feed records."
+      - name: external_order_ref
+        description: "External source-system order reference."
+      - name: customer_no
+        description: "External customer business key."
+      - name: order_date
+        description: "Date associated with the order."
+      - name: sku
+        description: "Product stock keeping unit."
+      - name: qty
+        description: "Ordered or inventory quantity."
+      - name: unit_price
+        description: "Unit price in the row currency."
+      - name: promo_code
+        description: "Promo code for this model."
+      - name: currency_code
+        description: "ISO currency code for monetary amounts."
+      - name: source_system
+        description: "Source system for this model."
+
+  - name: stg_raw_products
+    description: "Clean, typed staging view for raw products seed data."
+    columns:
+      - name: row_id
+        description: "Deterministic row identifier assigned to raw feed records."
+      - name: sku
+        description: "Product stock keeping unit."
+      - name: product_name
+        description: "Product name for this model."
+      - name: category_name
+        description: "Category name for this model."
+      - name: supplier_name
+        description: "Supplier name for this model."
+      - name: unit_cost
+        description: "Unit cost for this model."
+      - name: list_price
+        description: "List price for this model."
+
+  - name: stg_ref_countries
+    description: "Clean, typed staging view for ref countries seed data."
+    columns:
+      - name: country_code
+        description: "Country code for this model."
+      - name: country_name
+        description: "Country name for this model."
+      - name: region
+        description: "Region for this model."
+      - name: default_currency
+        description: "Default currency for this model."
+
+  - name: stg_ref_currencies
+    description: "Clean, typed staging view for ref currencies seed data."
+    columns:
+      - name: currency_code
+        description: "ISO currency code for monetary amounts."
+      - name: currency_name
+        description: "Currency name for this model."
+      - name: minor_units
+        description: "Minor units for this model."
+
+  - name: stg_ref_fx_rates
+    description: "Clean, typed staging view for ref fx rates seed data."
+    columns:
+      - name: from_currency
+        description: "From currency for this model."
+      - name: to_currency
+        description: "To currency for this model."
+      - name: rate_date
+        description: "Rate date for this model."
+      - name: rate
+        description: "Rate for this model."
+
+  - name: stg_stock_levels
+    description: "Clean, typed staging view for stock levels seed data."
+    columns:
+      - name: warehouse_id
+        description: "Warehouse identifier associated with inventory or fulfilment."
+      - name: product_id
+        description: "Product identifier used to join product and order models."
+      - name: qty_on_hand
+        description: "Inventory units physically on hand."
+      - name: qty_allocated
+        description: "Inventory units allocated to demand."
+      - name: qty_on_order
+        description: "Inventory units already on open purchase orders."
+      - name: reorder_point
+        description: "Reorder point for this model."
+      - name: reorder_qty
+        description: "Reorder qty for this model."
+
+  - name: stg_suppliers
+    description: "Clean, typed staging view for suppliers seed data."
+    columns:
+      - name: supplier_id
+        description: "Supplier identifier associated with the product."
+      - name: supplier_name
+        description: "Supplier name for this model."
+      - name: country_code
+        description: "Country code for this model."
+      - name: lead_time_days
+        description: "Lead time days for this model."
+      - name: is_active
+        description: "Is active for this model."
+
+  - name: stg_warehouses
+    description: "Clean, typed staging view for warehouses seed data."
+    columns:
+      - name: warehouse_id
+        description: "Warehouse identifier associated with inventory or fulfilment."
+      - name: warehouse_code
+        description: "Warehouse code for this model."
+      - name: warehouse_name
+        description: "Warehouse name for this model."
+      - name: country_code
+        description: "Country code for this model."
+      - name: is_active
+        description: "Is active for this model."

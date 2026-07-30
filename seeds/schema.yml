@@ -1,0 +1,362 @@
+version: 2
+
+seeds:
+  - name: config_param
+    description: "Seeded source data for config param."
+    columns:
+      - name: ParamKey
+        description: "Source column ParamKey from `seeds/config_param.csv`."
+        tests:
+          - not_null
+          - unique
+      - name: ParamValue
+        description: "Source column ParamValue from `seeds/config_param.csv`."
+      - name: ParamType
+        description: "Source column ParamType from `seeds/config_param.csv`."
+      - name: Description
+        description: "Source column Description from `seeds/config_param.csv`."
+
+  - name: customer
+    description: "Seeded source data for customer."
+    columns:
+      - name: CustomerId
+        description: "Source column CustomerId from `seeds/customer.csv`."
+        tests:
+          - not_null
+          - unique
+      - name: CustomerNo
+        description: "Source column CustomerNo from `seeds/customer.csv`."
+      - name: FirstName
+        description: "Source column FirstName from `seeds/customer.csv`."
+      - name: LastName
+        description: "Source column LastName from `seeds/customer.csv`."
+      - name: Email
+        description: "Source column Email from `seeds/customer.csv`."
+      - name: Phone
+        description: "Source column Phone from `seeds/customer.csv`."
+      - name: CountryCode
+        description: "Source column CountryCode from `seeds/customer.csv`."
+      - name: Status
+        description: "Source column Status from `seeds/customer.csv`."
+
+  - name: customer_address
+    description: "Seeded source data for customer address."
+    columns:
+      - name: AddressId
+        description: "Source column AddressId from `seeds/customer_address.csv`."
+        tests:
+          - not_null
+          - unique
+      - name: CustomerId
+        description: "Source column CustomerId from `seeds/customer_address.csv`."
+      - name: AddressType
+        description: "Source column AddressType from `seeds/customer_address.csv`."
+      - name: Line1
+        description: "Source column Line1 from `seeds/customer_address.csv`."
+      - name: Line2
+        description: "Source column Line2 from `seeds/customer_address.csv`."
+      - name: City
+        description: "Source column City from `seeds/customer_address.csv`."
+      - name: PostCode
+        description: "Source column PostCode from `seeds/customer_address.csv`."
+      - name: CountryCode
+        description: "Source column CountryCode from `seeds/customer_address.csv`."
+      - name: IsDefault
+        description: "Source column IsDefault from `seeds/customer_address.csv`."
+
+  - name: raw_customer
+    description: "Raw feed seed for raw customer migration validation."
+    columns:
+      - name: CustomerNo
+        description: "Source column CustomerNo from `seeds/feeds/raw_customer.csv`."
+      - name: FirstName
+        description: "Source column FirstName from `seeds/feeds/raw_customer.csv`."
+      - name: LastName
+        description: "Source column LastName from `seeds/feeds/raw_customer.csv`."
+      - name: Email
+        description: "Source column Email from `seeds/feeds/raw_customer.csv`."
+      - name: Phone
+        description: "Source column Phone from `seeds/feeds/raw_customer.csv`."
+      - name: Country
+        description: "Source column Country from `seeds/feeds/raw_customer.csv`."
+
+  - name: raw_fxrate
+    description: "Raw feed seed for raw fxrate migration validation."
+    columns:
+      - name: FromCurrency
+        description: "Source column FromCurrency from `seeds/feeds/raw_fxrate.csv`."
+      - name: ToCurrency
+        description: "Source column ToCurrency from `seeds/feeds/raw_fxrate.csv`."
+      - name: RateDateText
+        description: "Source column RateDateText from `seeds/feeds/raw_fxrate.csv`."
+      - name: RateText
+        description: "Source column RateText from `seeds/feeds/raw_fxrate.csv`."
+
+  - name: raw_order
+    description: "Raw feed seed for raw order migration validation."
+    columns:
+      - name: ExternalOrderRef
+        description: "Source column ExternalOrderRef from `seeds/feeds/raw_order.csv`."
+      - name: CustomerNo
+        description: "Source column CustomerNo from `seeds/feeds/raw_order.csv`."
+      - name: OrderDateText
+        description: "Source column OrderDateText from `seeds/feeds/raw_order.csv`."
+      - name: Sku
+        description: "Source column Sku from `seeds/feeds/raw_order.csv`."
+      - name: Qty
+        description: "Source column Qty from `seeds/feeds/raw_order.csv`."
+      - name: UnitPriceText
+        description: "Source column UnitPriceText from `seeds/feeds/raw_order.csv`."
+      - name: PromoCode
+        description: "Source column PromoCode from `seeds/feeds/raw_order.csv`."
+      - name: CurrencyCode
+        description: "Source column CurrencyCode from `seeds/feeds/raw_order.csv`."
+      - name: SourceSystem
+        description: "Source column SourceSystem from `seeds/feeds/raw_order.csv`."
+
+  - name: raw_product
+    description: "Raw feed seed for raw product migration validation."
+    columns:
+      - name: Sku
+        description: "Source column Sku from `seeds/feeds/raw_product.csv`."
+      - name: ProductName
+        description: "Source column ProductName from `seeds/feeds/raw_product.csv`."
+      - name: CategoryName
+        description: "Source column CategoryName from `seeds/feeds/raw_product.csv`."
+      - name: SupplierName
+        description: "Source column SupplierName from `seeds/feeds/raw_product.csv`."
+      - name: UnitCost
+        description: "Source column UnitCost from `seeds/feeds/raw_product.csv`."
+      - name: ListPrice
+        description: "Source column ListPrice from `seeds/feeds/raw_product.csv`."
+
+  - name: gl_account
+    description: "Seeded source data for gl account."
+    columns:
+      - name: GLAccountId
+        description: "Source column GLAccountId from `seeds/gl_account.csv`."
+        tests:
+          - not_null
+          - unique
+      - name: AccountCode
+        description: "Source column AccountCode from `seeds/gl_account.csv`."
+      - name: AccountName
+        description: "Source column AccountName from `seeds/gl_account.csv`."
+      - name: AccountType
+        description: "Source column AccountType from `seeds/gl_account.csv`."
+      - name: IsActive
+        description: "Source column IsActive from `seeds/gl_account.csv`."
+
+  - name: loyalty_account
+    description: "Seeded source data for loyalty account."
+    columns:
+      - name: LoyaltyAccountId
+        description: "Source column LoyaltyAccountId from `seeds/loyalty_account.csv`."
+        tests:
+          - not_null
+          - unique
+      - name: CustomerId
+        description: "Source column CustomerId from `seeds/loyalty_account.csv`."
+      - name: Tier
+        description: "Source column Tier from `seeds/loyalty_account.csv`."
+      - name: PointsBalance
+        description: "Source column PointsBalance from `seeds/loyalty_account.csv`."
+      - name: LifetimePoints
+        description: "Source column LifetimePoints from `seeds/loyalty_account.csv`."
+
+  - name: price_list
+    description: "Seeded source data for price list."
+    columns:
+      - name: PriceListId
+        description: "Source column PriceListId from `seeds/price_list.csv`."
+        tests:
+          - not_null
+          - unique
+      - name: PriceListName
+        description: "Source column PriceListName from `seeds/price_list.csv`."
+      - name: CurrencyCode
+        description: "Source column CurrencyCode from `seeds/price_list.csv`."
+      - name: EffectiveFrom
+        description: "Source column EffectiveFrom from `seeds/price_list.csv`."
+      - name: EffectiveTo
+        description: "Source column EffectiveTo from `seeds/price_list.csv`."
+      - name: IsActive
+        description: "Source column IsActive from `seeds/price_list.csv`."
+
+  - name: price_list_item
+    description: "Seeded source data for price list item."
+    columns:
+      - name: PriceListItemId
+        description: "Source column PriceListItemId from `seeds/price_list_item.csv`."
+        tests:
+          - not_null
+          - unique
+      - name: PriceListId
+        description: "Source column PriceListId from `seeds/price_list_item.csv`."
+      - name: ProductId
+        description: "Source column ProductId from `seeds/price_list_item.csv`."
+      - name: UnitPrice
+        description: "Source column UnitPrice from `seeds/price_list_item.csv`."
+
+  - name: product
+    description: "Seeded source data for product."
+    columns:
+      - name: ProductId
+        description: "Source column ProductId from `seeds/product.csv`."
+        tests:
+          - not_null
+          - unique
+      - name: Sku
+        description: "Source column Sku from `seeds/product.csv`."
+      - name: ProductName
+        description: "Source column ProductName from `seeds/product.csv`."
+      - name: CategoryId
+        description: "Source column CategoryId from `seeds/product.csv`."
+      - name: SupplierId
+        description: "Source column SupplierId from `seeds/product.csv`."
+      - name: UnitCost
+        description: "Source column UnitCost from `seeds/product.csv`."
+      - name: ListPrice
+        description: "Source column ListPrice from `seeds/product.csv`."
+      - name: Weight_g
+        description: "Source column Weight_g from `seeds/product.csv`."
+      - name: Status
+        description: "Source column Status from `seeds/product.csv`."
+
+  - name: product_category
+    description: "Seeded source data for product category."
+    columns:
+      - name: CategoryId
+        description: "Source column CategoryId from `seeds/product_category.csv`."
+        tests:
+          - not_null
+          - unique
+      - name: CategoryName
+        description: "Source column CategoryName from `seeds/product_category.csv`."
+      - name: ParentCategoryId
+        description: "Source column ParentCategoryId from `seeds/product_category.csv`."
+      - name: DefaultMarginPct
+        description: "Source column DefaultMarginPct from `seeds/product_category.csv`."
+
+  - name: promotion
+    description: "Seeded source data for promotion."
+    columns:
+      - name: PromotionId
+        description: "Source column PromotionId from `seeds/promotion.csv`."
+        tests:
+          - not_null
+          - unique
+      - name: PromoCode
+        description: "Source column PromoCode from `seeds/promotion.csv`."
+      - name: Description
+        description: "Source column Description from `seeds/promotion.csv`."
+      - name: PromoType
+        description: "Source column PromoType from `seeds/promotion.csv`."
+      - name: DiscountPct
+        description: "Source column DiscountPct from `seeds/promotion.csv`."
+      - name: DiscountAmt
+        description: "Source column DiscountAmt from `seeds/promotion.csv`."
+      - name: MinSpend
+        description: "Source column MinSpend from `seeds/promotion.csv`."
+      - name: CategoryId
+        description: "Source column CategoryId from `seeds/promotion.csv`."
+      - name: EffectiveFrom
+        description: "Source column EffectiveFrom from `seeds/promotion.csv`."
+      - name: EffectiveTo
+        description: "Source column EffectiveTo from `seeds/promotion.csv`."
+      - name: MaxRedemptions
+        description: "Source column MaxRedemptions from `seeds/promotion.csv`."
+      - name: IsActive
+        description: "Source column IsActive from `seeds/promotion.csv`."
+
+  - name: ref_country
+    description: "Seeded source data for ref country."
+    columns:
+      - name: CountryCode
+        description: "Source column CountryCode from `seeds/ref_country.csv`."
+        tests:
+          - not_null
+          - unique
+      - name: CountryName
+        description: "Source column CountryName from `seeds/ref_country.csv`."
+      - name: Region
+        description: "Source column Region from `seeds/ref_country.csv`."
+      - name: DefaultCurrency
+        description: "Source column DefaultCurrency from `seeds/ref_country.csv`."
+
+  - name: ref_currency
+    description: "Seeded source data for ref currency."
+    columns:
+      - name: CurrencyCode
+        description: "Source column CurrencyCode from `seeds/ref_currency.csv`."
+        tests:
+          - not_null
+          - unique
+      - name: CurrencyName
+        description: "Source column CurrencyName from `seeds/ref_currency.csv`."
+      - name: MinorUnits
+        description: "Source column MinorUnits from `seeds/ref_currency.csv`."
+
+  - name: ref_fxrate
+    description: "Seeded source data for ref fxrate."
+    columns:
+      - name: FromCurrency
+        description: "Source column FromCurrency from `seeds/ref_fxrate.csv`."
+      - name: ToCurrency
+        description: "Source column ToCurrency from `seeds/ref_fxrate.csv`."
+      - name: RateDate
+        description: "Source column RateDate from `seeds/ref_fxrate.csv`."
+      - name: Rate
+        description: "Source column Rate from `seeds/ref_fxrate.csv`."
+
+  - name: stock_level
+    description: "Seeded source data for stock level."
+    columns:
+      - name: WarehouseId
+        description: "Source column WarehouseId from `seeds/stock_level.csv`."
+      - name: ProductId
+        description: "Source column ProductId from `seeds/stock_level.csv`."
+      - name: QtyOnHand
+        description: "Source column QtyOnHand from `seeds/stock_level.csv`."
+      - name: QtyAllocated
+        description: "Source column QtyAllocated from `seeds/stock_level.csv`."
+      - name: QtyOnOrder
+        description: "Source column QtyOnOrder from `seeds/stock_level.csv`."
+      - name: ReorderPoint
+        description: "Source column ReorderPoint from `seeds/stock_level.csv`."
+      - name: ReorderQty
+        description: "Source column ReorderQty from `seeds/stock_level.csv`."
+
+  - name: supplier
+    description: "Seeded source data for supplier."
+    columns:
+      - name: SupplierId
+        description: "Source column SupplierId from `seeds/supplier.csv`."
+        tests:
+          - not_null
+          - unique
+      - name: SupplierName
+        description: "Source column SupplierName from `seeds/supplier.csv`."
+      - name: CountryCode
+        description: "Source column CountryCode from `seeds/supplier.csv`."
+      - name: LeadTimeDays
+        description: "Source column LeadTimeDays from `seeds/supplier.csv`."
+      - name: IsActive
+        description: "Source column IsActive from `seeds/supplier.csv`."
+
+  - name: warehouse
+    description: "Seeded source data for warehouse."
+    columns:
+      - name: WarehouseId
+        description: "Source column WarehouseId from `seeds/warehouse.csv`."
+        tests:
+          - not_null
+          - unique
+      - name: WarehouseCode
+        description: "Source column WarehouseCode from `seeds/warehouse.csv`."
+      - name: WarehouseName
+        description: "Source column WarehouseName from `seeds/warehouse.csv`."
+      - name: CountryCode
+        description: "Source column CountryCode from `seeds/warehouse.csv`."
+      - name: IsActive
+        description: "Source column IsActive from `seeds/warehouse.csv`."
