@@ -1,21 +1,35 @@
 CategoryId,CategoryName,ParentCategoryId,DefaultMarginPct
-1,Electronics,,0.342
-2,Computers,,0.158
-3,Mobile Phones,,0.233
-4,Home & Kitchen,,0.217
-5,Furniture,,0.371
-6,Garden & Outdoor,,0.353
-7,Toys & Games,,0.418
-8,Sports & Fitness,,0.176
-9,Beauty & Health,,0.277
-10,Grocery,,0.159
-11,Pet Supplies,,0.216
-12,Books,,0.302
-13,Music & Movies,,0.158
-14,Office Supplies,,0.21
-15,Automotive,,0.345
-16,Tools & DIY,,0.313
-17,Mens Clothing,,0.216
-18,Womens Clothing,,0.327
-19,Kids Clothing,,0.393
-20,Footwear,,0.152
+1,Electronics,21,0.342
+2,Computers,21,0.158
+3,Mobile Phones,21,0.233
+4,Home & Kitchen,22,0.217
+5,Furniture,22,0.371
+6,Garden & Outdoor,22,0.353
+7,Toys & Games,23,0.418
+8,Sports & Fitness,23,0.176
+9,Beauty & Health,24,0.277
+10,Grocery,24,0.159
+11,Pet Supplies,24,0.216
+12,Books,23,0.302
+13,Music & Movies,23,0.158
+14,Office Supplies,24,0.21
+15,Automotive,26,0.345
+16,Tools & DIY,26,0.313
+17,Mens Clothing,25,0.216
+18,Womens Clothing,25,0.327
+19,Kids Clothing,25,0.393
+20,Footwear,25,0.152
+21,Technology,,
+22,Home & Living,,
+23,Leisure,,
+24,Everyday,,
+25,Apparel,,
+26,Auto & Trade,,
+27,Wearables,21,0.288
+28,Audio,21,0.311
+29,Gaming,23,0.194
+30,Kitchen Appliances,22,0.246
+31,Bedding,22,0.334
+32,Cycling,23,0.221
+33,Stationery,24,0.263
+34,Skincare,24,0.402

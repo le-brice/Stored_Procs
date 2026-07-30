@@ -10212,3 +10212,19 @@ Finished 'show' with 2 warnings for target 'dev' [247ms]
 09:06:13.373711 [info ]: 
 ==================== Execution Summary =====================
 Finished 'show' with 2 warnings for target 'dev' [194ms]
+[0m12:44:19.368101 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'start', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x108d531c0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x10a040d60>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x10a040640>]}
+
+
+============================== 12:44:19.373204 | a8d2eec2-7349-48b8-9220-ada2a6f8d05d ==============================
+[0m12:44:19.373204 [info ] [MainThread]: Running with dbt=1.12.0
+[0m12:44:19.373591 [debug] [MainThread]: running dbt with arguments {'send_anonymous_usage_stats': 'True', 'log_cache_events': 'False', 'write_json': 'True', 'debug': 'False', 'no_print': 'None', 'static_parser': 'True', 'printer_width': '80', 'hints_enabled': 'True', 'profiles_dir': '/Users/cormacbuckley/.dbt', 'partial_parse': 'True', 'cache_selected_only': 'False', 'use_experimental_parser': 'False', 'empty': 'None', 'introspect': 'True', 'log_format': 'default', 'quiet': 'False', 'target_path': 'None', 'indirect_selection': 'eager', 'maximum_seed_size_mib': '1', 'invocation_command': 'dbt parse', 'use_colors': 'True', 'log_path': 'logs', 'warn_error': 'None', 'version_check': 'True', 'fail_fast': 'False', 'warn_error_options': 'WarnErrorOptionsV2(error=[], warn=[], silence=[])'}
+[0m12:44:19.374007 [error] [MainThread]: [[31mERROR[0m]: Encountered an error:
+Runtime Error
+  No dbt_project.yml found at expected path /Users/cormacbuckley/Documents/dbt-projects/Big_Stored_Proc/dbt_project.yml
+  Verify that each entry within packages.yml (and their transitive dependencies) contains a file named dbt_project.yml
+  
+[0m12:44:19.384213 [debug] [MainThread]: Resource report: {"command_name": "parse", "command_success": false, "command_wall_clock_time": 0.09034941, "process_in_blocks": "0", "process_kernel_time": 0.241308, "process_mem_max_rss": "107757568", "process_out_blocks": "0", "process_user_time": 0.936507}
+[0m12:44:19.384613 [debug] [MainThread]: Command `dbt parse` failed at 12:44:19.384548 after 0.09 seconds
+[0m12:44:19.384860 [debug] [MainThread]: Sending event: {'category': 'dbt', 'action': 'invocation', 'label': 'end', 'context': [<snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x108d531c0>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x10a042e90>, <snowplow_tracker.self_describing_json.SelfDescribingJson object at 0x10a040d00>]}
+[0m12:44:19.385103 [debug] [MainThread]: Flushing usage events
+[0m12:44:19.821975 [debug] [MainThread]: An error was encountered while trying to flush usage events
