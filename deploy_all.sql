@@ -92,15 +92,5 @@ PRINT '--- etl ---';
 PRINT '--- seed (runs after util procs exist) ---';
 :r $(repo)\schema\07_seed_reference.sql
 
-/* Constraints go LAST, after the data is in. Two reasons:
-     - the WITH CHECK constraints validate existing rows at creation
-       time, so they need the seed to be loaded and correct;
-     - several FKs cross schemas (dbo -> sales, fin -> util) which
-       the 01-06 load order cannot express.
-   If you are loading via seeds/load_seed.sql instead of 07, run
-   that first and then this file by hand. */
-PRINT '--- constraints + indexes (runs LAST, after data) ---';
-:r $(repo)\schema\08_constraints_indexes.sql
-
 PRINT '--- done ---';
 GO
