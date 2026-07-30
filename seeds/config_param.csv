@@ -9,3 +9,16 @@ settlement.fee.CARD,0.029,decimal,card processor fee
 settlement.fee.PAYPAL,0.034,decimal,paypal fee
 settlement.fee.GIFTCARD,0,decimal,no fee
 settlement.fee.STORECREDIT,0,decimal,no fee
+journal.mode,ACCRUAL,string,ACCRUAL|CASH|BOTH -- default posting basis
+journal.intercompany.enabled,1,bit,split revenue when ship country differs from customer country
+journal.fx.reval.enabled,0,bit,period-end AR revaluation (month end only)
+journal.rounding.tolerance,0.05,decimal,max plug to 9999 before we throw
+journal.defer.unshipped,1,bit,PAID but not SHIPPED goes to 2400 Deferred Revenue
+journal.ic.markup.pct,0.03,decimal,intercompany transfer markup
+import.price.variance.tolerance,0.15,decimal,feed price vs list price before reject
+import.max.orders,5000,int,safety valve per import run
+import.dedupe.enabled,1,bit,collapse repeated ExternalOrderRef in one feed
+batch.step.retry.max,2,int,retries per nightly step before giving up
+batch.step.retry.delay.seconds,5,int,backoff between step retries
+batch.sla.minutes,90,int,warn if the nightly batch runs longer than this
+reorder.enabled,1,bit,gate for the nightly reorder sweep (step 100)

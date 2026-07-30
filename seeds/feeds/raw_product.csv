@@ -3,3 +3,35 @@ SKU-99-9001,Gadget Widget A,Electronics,Acme Distribution,12.50,29.99
 SKU-99-9002,Gadget Widget B,Electronics,Acme Distribution,18.00,39.99
 SKU-12-9003,Mystery Novel,Books,Northwind Traders,4.25,12.99
 SKU-99-9004,Bad Cost Item,Grocery,Soylent Foods,not-a-number,5.49
+SKU-99-9005,Swift Widget 9005,Electronics,Gringotts Trading,40.17,95.24
+SKU-99-9006,Prime Widget 9006,Electronics,Black Mesa Wholesale,60.41,124.20
+SKU-99-9007,Vertex Widget 9007,Cycling,Tyrell Supply Co,287.21,675.42
+SKU-99-9008,Nova Widget 9008,Kids Clothing,Hooli Logistics,151.60,268.97
+SKU-99-9009,Swift Widget 9009,Furniture,Acme Distribution,260.55,490.80
+SKU-99-9010,Max Widget 9010,Beauty & Health,Stark Components,162.30,249.42
+SKU-99-9011,Swift Widget 9011,Kitchen Appliances,Aviato Supply,11.59,20.25
+SKU-99-9012,Lumen Widget 9012,Tools & DIY,Soylent Foods,98.82,223.60
+SKU-99-9013,Lite Widget 9013,Footwear,Globex Supply,51.12,105.61
+SKU-99-9014,Classic Widget 9014,Mobile Phones,Hooli Logistics,263.06,596.16
+SKU-99-9015,Swift Widget 9015,Pet Supplies,Globex Supply,126.80,302.09
+SKU-99-9016,Pro Widget 9016,Stationery,Abstergo Supply,16.50,32.44
+SKU-99-9017,Lite Widget 9017,Electronics,Hooli Logistics,107.82,228.46
+SKU-99-9018,Max Widget 9018,Beauty & Health,Aviato Supply,283.16,579.80
+SKU-99-9019,Basic Widget 9019,Garden & Outdoor,Vandelay Imports,165.13,248.12
+SKU-99-9020,Lite Widget 9020,Audio,Gekko & Co,65.99,105.81
+SKU-99-9021,Plus Widget 9021,Footwear,Aperture Components,117.90,202.77
+SKU-99-9022,Max Widget 9022,Gaming,Pied Piper Parts,141.56,227.26
+SKU-99-9023,Studio Widget 9023,Tools & DIY,Gringotts Trading,74.52,163.44
+SKU-99-9024,Nova Widget 9024,Computers,Abstergo Supply,56.52,92.69
+SKU-99-9025,Nova Widget 9025,Mobile Phones,Tyrell Supply Co,119.19,279.90
+SKU-99-9026,Swift Widget 9026,Kitchen Appliances,Wayne Industrial,255.24,506.83
+SKU-99-9027,Swift Widget 9027,Tools & DIY,Duff Wholesale,227.28,382.65
+SKU-99-9028,Prime Widget 9028,Garden & Outdoor,Stark Components,100.92,171.60
+SKU-99-9029,Nova Widget 9029,Skincare,Roxxon Trading,207.73,432.61
+SKU-99-9030,Ultra Widget 9030,Books,Acme Distribution,175.15,295.61
+SKU-99-9031,Swift Widget 9031,Home & Kitchen,Bishop Brothers,107.35,198.40
+SKU-99-9032,Prime Widget 9032,Electronics,Cyberdyne Parts,276.56,521.18
+SKU-99-9900,Unknown Category Item,Nonexistent Category,Acme Distribution,10.00,24.99
+SKU-99-9901,Unknown Supplier Item,Books,Nobody Trading Ltd,8.00,18.99
+,Missing Sku Item,Grocery,Soylent Foods,3.00,6.99
+SKU-99-9903,Bad List Price,Footwear,Acme Distribution,20.00,n/a

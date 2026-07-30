@@ -4,3 +4,47 @@ C2002,Alan,Turing,alan.turing@example.com,+44-20-2002,United Kingdom
 C2003,Ada,Lovelace,,+44-20-2003,UK
 ,Edsger,Dijkstra,ed.dijkstra@example.com,+31-20-2004,Netherlands
 C2005,Katherine,Johnson,k.johnson@example.com,,USA
+C2006,Jean,Bartik,jean.bartik@example.com,+31-20-2006,nl
+C2007,Nikolaus,Meier,n.meier@example.com,+41-44-2007,CH
+C2008,Milan,Lopez,milan.lopez2008@example.com,+1-555-8835,France
+C2009,Yusuf,Dubois,yusuf.dubois2009@example.com,+1-555-4134,Ireland
+C2010,Nora,Costa,nora.costa2010@example.com,+1-555-4353,Canada
+C2011,Chloe,Berg,chloe.berg2011@example.com,+1-555-4568,USA
+C2012,Anja,Garcia,anja.garcia2012@example.com,+1-555-3015,United Kingdom
+C2013,Milan,Silva,milan.silva2013@example.com,+1-555-4050,America
+C2014,Otto,Kaur,otto.kaur2014@example.com,+1-555-2476,America
+C2015,Lena,Murphy,lena.murphy2015@example.com,+1-555-2478,United States
+C2016,Ines,Hansen,ines.hansen2016@example.com,+1-555-1360,United States
+C2017,Ethan,Meyer,ethan.meyer2017@example.com,+1-555-3899,Eire
+C2018,Maja,Bauer,maja.bauer2018@example.com,+1-555-1498,United Kingdom
+C2019,Ava,Vargas,ava.vargas2019@example.com,+1-555-3421,Germany
+C2020,Lena,Costa,lena.costa2020@example.com,+1-555-5047,America
+C2021,Pablo,Costa,pablo.costa2021@example.com,+1-555-7669,Netherlands
+C2022,Liam,Rossi,liam.rossi2022@example.com,+1-555-6717,Canada
+C2023,Elif,Nakamura,elif.nakamura2023@example.com,+1-555-4612,Ireland
+C2024,Zoe,Nakamura,zoe.nakamura2024@example.com,+1-555-3489,America
+C2025,Hugo,Larsen,hugo.larsen2025@example.com,+1-555-1970,United Kingdom
+C2026,Kai,Schmidt,kai.schmidt2026@example.com,+1-555-8248,Deutschland
+C2027,Marek,Rossi,marek.rossi2027@example.com,+1-555-6583,United States
+C2028,Alma,Kowalski,alma.kowalski2028@example.com,+1-555-1525,Germany
+C2029,Ava,Nakamura,ava.nakamura2029@example.com,+1-555-7122,USA
+C2030,Alma,Petrov,alma.petrov2030@example.com,+1-555-5699,France
+C2031,Hugo,Kelly,hugo.kelly2031@example.com,+1-555-1801,Ireland
+C2032,Kai,Petrov,kai.petrov2032@example.com,+1-555-2098,Eire
+C2033,Lucas,Larsen,lucas.larsen2033@example.com,+1-555-2945,France
+C2034,Kai,Novak,kai.novak2034@example.com,+1-555-2339,Eire
+C2035,Yusuf,Hansen,yusuf.hansen2035@example.com,+1-555-9576,UK
+C2036,Ines,Vargas,ines.vargas2036@example.com,+1-555-4606,Ireland
+C2037,Lena,Novak,lena.novak2037@example.com,+1-555-2051,Germany
+C2038,Ava,Meyer,ava.meyer2038@example.com,+1-555-6450,United States
+C2039,Ines,Berg,ines.berg2039@example.com,+1-555-2474,Deutschland
+C2040,Nadia,Berg,nadia.berg2040@example.com,+1-555-7114,UK
+C2041,Ines,Brennan,ines.brennan2041@example.com,+1-555-3105,Eire
+C2042,Freya,Schmidt,freya.schmidt2042@example.com,+1-555-8547,France
+C2043,Mia,Silva,mia.silva2043@example.com,+1-555-9077,United States
+C2044,Aiden,Schmidt,aiden.schmidt2044@example.com,+1-555-8529,Ireland
+C2045,Felix,Reyes,felix.reyes2045@example.com,+1-555-7646,Germany
+,Missing,CustomerNo,missing.no@example.com,+1-555-0101,United States
+C2900,No,Email,,+1-555-0102,Ireland
+C2901,Unmapped,Country,unmapped@example.com,+1-555-0103,Ruritania
+C2902,Bare,Code,bare.code@example.com,+1-555-0104,ZZ

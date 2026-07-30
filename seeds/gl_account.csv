@@ -5,3 +5,25 @@ GLAccountId,AccountCode,AccountName,AccountType,IsActive
 4,4000,Sales Revenue,REVENUE,1
 5,5000,Cost of Goods Sold,EXPENSE,1
 6,9999,FX Rounding Suspense,EXPENSE,1
+7,1210,Accounts Receivable - Intercompany,ASSET,1
+8,2400,Deferred Revenue,LIABILITY,1
+9,4100,Intercompany Revenue,REVENUE,1
+10,6900,FX Gain/Loss,EXPENSE,1
+11,1000,Cash at Bank,ASSET,1
+12,1100,Payment Processor Clearing,ASSET,1
+13,1310,Inventory in Transit,ASSET,1
+14,1400,Prepaid Expenses,ASSET,1
+15,1500,Fixed Assets,ASSET,1
+16,2000,Accounts Payable,LIABILITY,1
+17,2100,Accrued Liabilities,LIABILITY,1
+18,2300,Gift Card Liability,LIABILITY,1
+19,2500,Loyalty Points Liability,LIABILITY,1
+20,3000,Retained Earnings,EQUITY,1
+21,4200,Shipping Revenue,REVENUE,1
+22,4900,Sales Returns & Allowances,REVENUE,1
+23,5100,Freight In,EXPENSE,1
+24,5200,Inventory Shrinkage,EXPENSE,1
+25,6000,Payment Processing Fees,EXPENSE,1
+26,6100,Wages & Salaries,EXPENSE,1
+27,6200,Rent & Facilities,EXPENSE,1
+28,6800,Bad Debt Expense,EXPENSE,1

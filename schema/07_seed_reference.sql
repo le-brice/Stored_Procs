@@ -23,13 +23,19 @@ MERGE ref.Country AS t USING (VALUES
 WHEN NOT MATCHED THEN INSERT (CountryCode,CountryName,Region,DefaultCurrency)
      VALUES (s.CountryCode,s.CountryName,s.Region,s.DefaultCurrency);
 
-/* GL accounts referenced by the finance procs */
+/* GL accounts referenced by the finance procs.
+   1210/2400/4100/6900 were added in 2020 when fin.usp_GenerateSalesJournal
+   grew the intercompany, deferral and FX revaluation passes. */
 MERGE fin.GLAccount AS t USING (VALUES
     ('1200','Accounts Receivable','ASSET'),
+    ('1210','Accounts Receivable - Intercompany','ASSET'),
     ('1300','Inventory','ASSET'),
     ('2200','Sales Tax Payable','LIABILITY'),
+    ('2400','Deferred Revenue','LIABILITY'),
     ('4000','Sales Revenue','REVENUE'),
+    ('4100','Intercompany Revenue','REVENUE'),
     ('5000','Cost of Goods Sold','EXPENSE'),
+    ('6900','FX Gain/Loss','EXPENSE'),
     ('9999','FX Rounding Suspense','EXPENSE')
 ) AS s(AccountCode,AccountName,AccountType) ON t.AccountCode=s.AccountCode
 WHEN NOT MATCHED THEN INSERT (AccountCode,AccountName,AccountType) VALUES (s.AccountCode,s.AccountName,s.AccountType);
@@ -51,7 +57,20 @@ MERGE util.ConfigParam AS t USING (VALUES
     ('settlement.fee.CARD','0.029','decimal','card processor fee'),
     ('settlement.fee.PAYPAL','0.034','decimal','paypal fee'),
     ('settlement.fee.GIFTCARD','0','decimal','no fee'),
-    ('settlement.fee.STORECREDIT','0','decimal','no fee')
+    ('settlement.fee.STORECREDIT','0','decimal','no fee'),
+    ('journal.mode','ACCRUAL','string','ACCRUAL|CASH|BOTH -- default posting basis'),
+    ('journal.intercompany.enabled','1','bit','split revenue when ship country <> customer country'),
+    ('journal.fx.reval.enabled','0','bit','period-end AR revaluation (month end only)'),
+    ('journal.rounding.tolerance','0.05','decimal','max plug to 9999 before we throw'),
+    ('journal.defer.unshipped','1','bit','PAID but not SHIPPED -> 2400 Deferred Revenue'),
+    ('journal.ic.markup.pct','0.03','decimal','intercompany transfer markup'),
+    ('import.price.variance.tolerance','0.15','decimal','feed price vs list price before reject'),
+    ('import.max.orders','5000','int','safety valve per import run'),
+    ('import.dedupe.enabled','1','bit','collapse repeated ExternalOrderRef in one feed'),
+    ('batch.step.retry.max','2','int','retries per nightly step before giving up'),
+    ('batch.step.retry.delay.seconds','5','int','backoff between step retries'),
+    ('batch.sla.minutes','90','int','warn if the nightly batch runs longer than this'),
+    ('reorder.enabled','1','bit','gate for the nightly reorder sweep (step 100)')
 ) AS s(ParamKey,ParamValue,ParamType,Description) ON t.ParamKey=s.ParamKey
 WHEN NOT MATCHED THEN INSERT (ParamKey,ParamValue,ParamType,Description)
      VALUES (s.ParamKey,s.ParamValue,s.ParamType,s.Description);
