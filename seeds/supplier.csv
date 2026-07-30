@@ -7,26 +7,3 @@ SupplierId,SupplierName,CountryCode,LeadTimeDays,IsActive
 6,Soylent Foods,IE,7,1
 7,Stark Components,US,10,1
 8,Wayne Industrial,CA,21,0
-9,Vandelay Imports,NZ,7,0
-10,Cyberdyne Parts,MX,21,1
-11,Tyrell Supply Co,FR,7,1
-12,Gringotts Trading,FR,10,1
-13,Duff Wholesale,US,7,1
-14,Bluth Distribution,US,5,1
-15,Prestige Worldwide,NZ,5,1
-16,Sterling Cooper Supply,BR,10,1
-17,Pierce Holdings,CH,10,1
-18,Vehement Capital,SE,10,1
-19,Hooli Logistics,NO,10,0
-20,Pied Piper Parts,DE,28,1
-21,Aviato Supply,LU,21,1
-22,Massive Dynamic,PT,28,1
-23,Roxxon Trading,SG,10,1
-24,Oscorp Materials,US,21,1
-25,Abstergo Supply,SG,5,0
-26,Aperture Components,PL,7,0
-27,Black Mesa Wholesale,PT,7,0
-28,Nakatomi Trading,AT,21,1
-29,Weyland Supply,SE,5,1
-30,Gekko & Co,FR,21,1
-31,Bishop Brothers,IT,21,1

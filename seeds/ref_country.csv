@@ -5,29 +5,3 @@ IE,Ireland,EU,EUR
 DE,Germany,EU,EUR
 FR,France,EU,EUR
 CA,Canada,NA,CAD
-NL,Netherlands,EU,EUR
-BE,Belgium,EU,EUR
-ES,Spain,EU,EUR
-IT,Italy,EU,EUR
-PT,Portugal,EU,EUR
-AT,Austria,EU,EUR
-FI,Finland,EU,EUR
-GR,Greece,EU,EUR
-LU,Luxembourg,EU,EUR
-SE,Sweden,EU,SEK
-NO,Norway,EU,NOK
-DK,Denmark,EU,DKK
-PL,Poland,EU,PLN
-CH,Switzerland,EU,CHF
-AU,Australia,APAC,AUD
-NZ,New Zealand,APAC,AUD
-JP,Japan,APAC,JPY
-SG,Singapore,APAC,USD
-HK,Hong Kong,APAC,USD
-MX,Mexico,LATAM,MXN
-BR,Brazil,LATAM,USD
-AR,Argentina,LATAM,USD
-CL,Chile,LATAM,USD
-ZA,South Africa,EMEA,USD
-AE,United Arab Emirates,EMEA,USD
-IL,Israel,EMEA,USD
