@@ -3,7 +3,7 @@ version: 2
 sources:
   - name: merlinco_apothecaries
     description: Raw Merlin & Co. Apothecaries operational tables.
-    database: RAW_WIZARD
+    database: dbt_sandbox_brice
     schema: MERLINCO_APOTHECARIES
     tables:
       - name: RAW_CUSTOMERS
