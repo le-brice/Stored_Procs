@@ -1,0 +1,154 @@
+version: 2
+
+models:
+  - name: int_raw_orders_validated
+    description: Raw order feed rows with deterministic reject reasons from etl.usp_ImportRawOrders pre-flight checks.
+    columns:
+      - name: row_id
+        tests:
+          - unique
+          - not_null
+      - name: reject_reason
+        description: Null for importable rows; otherwise the legacy procedure reject reason.
+
+  - name: fct_orders
+    description: Deterministic order headers derived from clean raw order groups, replacing the procedural create/import/confirm flow for analytics.
+    columns:
+      - name: order_id
+        tests:
+          - unique
+          - not_null
+      - name: external_order_ref
+        tests:
+          - unique
+          - not_null
+      - name: customer_id
+        tests:
+          - not_null
+      - name: status
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['CONFIRMED', 'PAID', 'SHIPPED', 'COMPLETED', 'CANCELLED', 'NEW', 'ONHOLD']
+      - name: grand_total
+        tests:
+          - not_null
+
+  - name: fct_order_lines
+    description: Deterministic order line facts, including imported unit price overrides, tax rates, and merged duplicate product lines.
+    columns:
+      - name: order_line_id
+        tests:
+          - unique
+          - not_null
+      - name: order_id
+        tests:
+          - relationships:
+              arguments:
+                to: ref('fct_orders')
+                field: order_id
+      - name: product_id
+        tests:
+          - not_null
+      - name: qty
+        tests:
+          - not_null
+
+  - name: rpt_daily_sales_summary
+    description: Daily sales mart at date, warehouse, and category grain, replacing rpt.usp_BuildDailySales.
+    columns:
+      - name: summary_date
+        tests:
+          - not_null
+      - name: warehouse_id
+        tests:
+          - not_null
+      - name: category_id
+        tests:
+          - not_null
+
+  - name: rpt_customer_ltv
+    description: Customer LTV mart with USD conversion, recency score, and VIP/LAPSED/NEW/REGULAR segmentation from rpt.usp_BuildCustomerLtv.
+    columns:
+      - name: customer_id
+        tests:
+          - unique
+          - not_null
+      - name: segment
+        tests:
+          - accepted_values:
+              arguments:
+                values: ['VIP', 'REGULAR', 'LAPSED', 'NEW']
+
+  - name: rpt_inventory_snapshot
+    description: Current stock snapshot and reorder flag logic replacing rpt.usp_BuildInventorySnapshot.
+    columns:
+      - name: snapshot_date
+        tests:
+          - not_null
+      - name: warehouse_id
+        tests:
+          - not_null
+      - name: product_id
+        tests:
+          - not_null
+
+  - name: rpt_low_stock_report
+    description: Low-stock purchasing view based on the dbt inventory snapshot.
+    columns:
+      - name: warehouse_id
+        tests:
+          - not_null
+      - name: product_id
+        tests:
+          - not_null
+
+  - name: rpt_reorder_recommendations
+    description: Reorder recommendations by warehouse, supplier, and product using configured or default reorder thresholds.
+    columns:
+      - name: warehouse_id
+        tests:
+          - not_null
+      - name: supplier_id
+        tests:
+          - not_null
+      - name: product_id
+        tests:
+          - not_null
+
+  - name: rpt_top_products_by_revenue
+    description: Product-grain revenue mart replacing rpt.usp_TopProductsByRevenue and intentionally fixing the legacy category-as-product fallback bug.
+    columns:
+      - name: product_id
+        tests:
+          - unique
+          - not_null
+
+  - name: fct_sales_journal_lines
+    description: Generated sales journal lines in USD, replacing fin.usp_GenerateSalesJournal for analytics.
+    columns:
+      - name: journal_line_key
+        tests:
+          - unique
+          - not_null
+      - name: entry_date
+        tests:
+          - not_null
+      - name: account_code
+        tests:
+          - not_null
+
+  - name: fct_journal_balance
+    description: Journal balance check by entry date and source.
+    columns:
+      - name: entry_date
+        tests:
+          - not_null
+      - name: source
+        tests:
+          - not_null
+      - name: is_balanced
+        tests:
+          - accepted_values:
+              arguments:
+                values: [true]

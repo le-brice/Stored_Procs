@@ -7,7 +7,11 @@ version: '1.0.0'
 config-version: 2
 
 # This setting configures which "profile" dbt uses for this project.
+<<<<<<< HEAD
+profile: 'storedProcs'
+=======
 profile: 'default'
+>>>>>>> 9a8056344913bac4852ac048cdc4af3a86519227
 
 # These configurations specify where dbt should look for different types of files.
 # The `model-paths` config, for example, states that models in this project can be
@@ -37,6 +41,14 @@ clean-targets:         # directories to be removed by `dbt clean`
 
 models:
   my_new_project:
+<<<<<<< HEAD
+    staging:
+      +materialized: view
+    intermediate:
+      +materialized: view
+    marts:
+=======
     # Applies to all files under models/example/
     example:
+>>>>>>> 9a8056344913bac4852ac048cdc4af3a86519227
       +materialized: table
