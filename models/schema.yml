@@ -2,153 +2,315 @@ version: 2
 
 models:
   - name: int_raw_orders_validated
-    description: Raw order feed rows with deterministic reject reasons from etl.usp_ImportRawOrders pre-flight checks.
+    description: >
+      One row per raw order line, retaining rejected rows for inspection. Applies
+      customer, active-product, and positive-quantity checks from etl.usp_ImportRawOrders.
+      Any rejected line prevents its entire external order reference from importing.
     columns:
       - name: row_id
-        tests:
-          - unique
-          - not_null
+        description: Feed row identifier used for validation and first-line pricing precedence.
+        tests: [unique, not_null]
       - name: reject_reason
-        description: Null for importable rows; otherwise the legacy procedure reject reason.
+        description: Null for importable rows; otherwise the first legacy validation failure.
 
   - name: fct_orders
-    description: Deterministic order headers derived from clean raw order groups, replacing the procedural create/import/confirm flow for analytics.
+    description: >
+      One header per accepted external order reference across all available feed history.
+      Replaces the analytical result of create/import/confirm; all reconstructed orders
+      are CONFIRMED. IDs are rebuild-derived ranks and are not operational identifiers.
+      Monetary amounts are in currency_code. No payments, shipments, or mutations occur.
     columns:
       - name: order_id
-        tests:
-          - unique
-          - not_null
+        description: Rank-derived analytical key; may shift when earlier references arrive.
+        tests: [unique, not_null]
+      - name: order_no
+        description: Analytical display number derived from order_id, not an issued document number.
       - name: external_order_ref
-        tests:
-          - unique
-          - not_null
+        description: Feed business key grouping accepted lines into a single order.
+        tests: [unique, not_null]
       - name: customer_id
+        description: Customer master key resolved from the feed customer number.
         tests:
           - not_null
+          - relationships:
+              arguments: {to: "ref('int_customer_master')", field: customer_id}
+      - name: order_date
+        description: Maximum supplied date per external reference; falls back to the build date.
+        tests: [not_null]
       - name: status
+        description: CONFIRMED for reconstructed feed orders; not an observed operational lifecycle.
         tests:
           - accepted_values:
               arguments:
                 values: ['CONFIRMED', 'PAID', 'SHIPPED', 'COMPLETED', 'CANCELLED', 'NEW', 'ONHOLD']
+      - name: currency_code
+        description: Currency of the order amounts; revenue marts do not all normalize currency.
+        tests: [not_null]
+      - name: promotion_id
+        description: Matched promotion, including a matched promotion that failed eligibility checks.
+      - name: subtotal
+        description: Sum of unit_price times quantity before discounts and tax.
+      - name: discount_total
+        description: Eligible header promotion discount; excludes line discounts.
+      - name: tax_total
+        description: Sum of line taxes calculated before the header promotion discount.
+      - name: shipping_total
+        description: Zero for the reconstructed feed orders.
       - name: grand_total
-        tests:
-          - not_null
+        description: Subtotal less line and header discounts plus tax; shipping is zero in this dataset.
+        tests: [not_null]
+      - name: warehouse_id
+        description: Warehouse resolved from configured default warehouse code, falling back to WH01.
+        tests: [not_null]
+      - name: source_system
+        description: Maximum feed source-system value for the external reference.
+      - name: promo_reject_reason
+        description: Reason the requested promotion was rejected; null when absent or eligible.
 
   - name: fct_order_lines
-    description: Deterministic order line facts, including imported unit price overrides, tax rates, and merged duplicate product lines.
+    description: >
+      One line per accepted external order reference and product. Repeated product lines
+      merge quantities and retain the first feed row's resolved price and tax rate.
+      Amounts are in the parent order currency; line discount is currently zero.
     columns:
       - name: order_line_id
-        tests:
-          - unique
-          - not_null
+        description: Analytical key derived from order_id and line sequence, not an operational ID.
+        tests: [unique, not_null]
       - name: order_id
+        description: Parent analytical order key.
         tests:
+          - not_null
           - relationships:
-              arguments:
-                to: ref('fct_orders')
-                field: order_id
+              arguments: {to: "ref('fct_orders')", field: order_id}
+      - name: line_no
+        description: Sequence within the order, ordered by first contributing feed row.
       - name: product_id
+        description: Product master key resolved from the feed SKU.
         tests:
           - not_null
+          - relationships:
+              arguments: {to: "ref('int_product_master')", field: product_id}
       - name: qty
-        tests:
-          - not_null
+        description: Sum of accepted positive feed quantities for this product and order.
+        tests: [not_null]
+      - name: unit_price
+        description: Imported override, then active price-list price, then converted USD product list price.
+        tests: [not_null]
+      - name: line_discount
+        description: Zero in this feed reconstruction; header promotions live on fct_orders.
+      - name: tax_rate
+        description: Fractional tax rate based on customer country and category exemptions.
+      - name: line_tax
+        description: Quantity times unit price times tax rate, rounded to four decimal places.
+      - name: line_total
+        description: Tax-inclusive line total before header promotion discounts.
 
   - name: rpt_daily_sales_summary
-    description: Daily sales mart at date, warehouse, and category grain, replacing rpt.usp_BuildDailySales.
+    description: >
+      One row per order date, warehouse, and category for orders excluding CANCELLED/NEW.
+      Replaces rpt.usp_BuildDailySales across all history. Header discounts are allocated
+      proportionally by gross line revenue. Amounts retain order currency and can mix
+      currencies within a group; this is legacy parity, not a normalized USD measure.
     columns:
       - name: summary_date
-        tests:
-          - not_null
+        description: Order date of the sales activity.
+        tests: [not_null]
       - name: warehouse_id
-        tests:
-          - not_null
+        description: Order warehouse; part of the composite grain.
+        tests: [not_null]
       - name: category_id
-        tests:
-          - not_null
+        description: Product category, with zero for missing category; part of the composite grain.
+        tests: [not_null]
+      - name: order_count
+        description: Distinct orders within the category; not additive across categories.
+      - name: units_sold
+        description: Total line quantity.
+      - name: gross_revenue
+        description: Unit price times quantity before tax and discounts, in original order currencies.
+      - name: discount_total
+        description: Line discounts plus proportionally allocated header discounts.
+      - name: net_revenue
+        description: Gross revenue less discounts, excluding tax.
+      - name: est_margin
+        description: Net revenue less quantity times current product unit cost; currency normalization is not applied.
 
   - name: rpt_customer_ltv
-    description: Customer LTV mart with USD conversion, recency score, and VIP/LAPSED/NEW/REGULAR segmentation from rpt.usp_BuildCustomerLtv.
+    description: >
+      One row per customer with at least one order excluding CANCELLED/NEW, regardless
+      of current customer status. Preserves rpt.usp_BuildCustomerLtv SQL rather than its
+      misleading active-customers comment. Orders are converted to USD and rounded per
+      order to four places. Uses the UTC run-start date, or ISO ltv_as_of_date variable,
+      for recency only; overriding it does not filter future orders. Rebuilt as a table.
+      VIP spend threshold is 12000 USD and is separate from loyalty points thresholds.
     columns:
       - name: customer_id
+        description: Customer key at the one-row-per-purchasing-customer grain.
         tests:
           - unique
           - not_null
+          - relationships:
+              arguments: {to: "ref('int_customer_master')", field: customer_id}
+      - name: first_order_date
+        description: Earliest qualifying order date.
+        tests: [not_null]
+      - name: last_order_date
+        description: Latest qualifying order date used for recency weighting.
+        tests: [not_null]
+      - name: order_count
+        description: Count of qualifying order headers, including zero-value orders.
+        tests: [not_null]
+      - name: total_net_spend
+        description: Sum of USD-converted grand totals, including taxes and shipping if present; not revenue net of tax or returns.
+        tests: [not_null]
+      - name: avg_order_value
+        description: Total USD spend divided by qualifying order count.
+        tests: [not_null]
+      - name: ltv_score
+        description: USD spend weighted by 0.5 when last order is over 365 days old, otherwise 1; rounded to cents.
+        tests: [not_null]
       - name: segment
+        description: VIP for spend >= 12000; otherwise LAPSED after 365 days; otherwise NEW for one order; otherwise REGULAR.
         tests:
+          - not_null
           - accepted_values:
-              arguments:
-                values: ['VIP', 'REGULAR', 'LAPSED', 'NEW']
+              arguments: {values: ['VIP', 'REGULAR', 'LAPSED', 'NEW']}
 
   - name: rpt_inventory_snapshot
-    description: Current stock snapshot and reorder flag logic replacing rpt.usp_BuildInventorySnapshot.
+    description: >
+      One row per current stock warehouse and product, dated at build time. Replaces
+      rpt.usp_BuildInventorySnapshot. This full-rebuild table retains only the current
+      snapshot; it is not historical inventory. Product costs are assumed base USD.
     columns:
       - name: snapshot_date
-        tests:
-          - not_null
+        description: Session date at build time; no history is accumulated.
+        tests: [not_null]
       - name: warehouse_id
-        tests:
-          - not_null
+        description: Stock warehouse; part of the composite grain.
+        tests: [not_null]
       - name: product_id
-        tests:
-          - not_null
+        description: Stock product; part of the composite grain.
+        tests: [not_null]
+      - name: qty_on_hand
+        description: Physical units on hand from the stock seed.
+      - name: qty_allocated
+        description: Units reserved for orders.
+      - name: qty_available
+        description: On-hand units less allocated units.
+      - name: stock_value
+        description: On-hand quantity times current product cost, rounded to four decimals.
+      - name: below_reorder
+        description: One when available plus on-order quantity is at or below the effective reorder point, else zero.
 
   - name: rpt_low_stock_report
-    description: Low-stock purchasing view based on the dbt inventory snapshot.
+    description: One row per warehouse and product flagged below reorder in the current inventory snapshot; an advisory report, not a purchase order.
     columns:
       - name: warehouse_id
-        tests:
-          - not_null
+        description: Warehouse needing replenishment.
+        tests: [not_null]
       - name: product_id
-        tests:
-          - not_null
+        description: Product needing replenishment.
+        tests: [not_null]
+      - name: sku
+        description: Product business identifier.
+      - name: product_name
+        description: Current product display name.
+      - name: supplier_name
+        description: Preferred supplier name, if known.
+      - name: qty_available
+        description: On-hand less allocated units.
+      - name: on_order
+        description: Outstanding inbound purchase quantity.
 
   - name: rpt_reorder_recommendations
-    description: Reorder recommendations by warehouse, supplier, and product using configured or default reorder thresholds.
+    description: One row per warehouse and active product with a supplier at or below the reorder point; uses product-specific thresholds then config defaults. Does not create purchase orders.
     columns:
       - name: warehouse_id
-        tests:
-          - not_null
+        description: Warehouse requiring stock.
+        tests: [not_null]
       - name: supplier_id
-        tests:
-          - not_null
+        description: Product's preferred supplier.
+        tests: [not_null]
       - name: product_id
-        tests:
-          - not_null
+        description: Active product to replenish.
+        tests: [not_null]
+      - name: recommended_order_qty
+        description: Product-specific reorder quantity or configured default.
+      - name: unit_cost
+        description: Current product unit cost in base currency.
+      - name: estimated_cost
+        description: Recommended quantity times unit cost, treating missing cost as zero.
 
   - name: rpt_top_products_by_revenue
-    description: Product-grain revenue mart replacing rpt.usp_TopProductsByRevenue and intentionally fixing the legacy category-as-product fallback bug.
+    description: >
+      One row per product with qualifying sales across all history; consumers apply
+      ranking and date filters. Fixes the legacy category-as-product fallback bug.
+      Revenue is after line discounts but before header promotions and tax, in original
+      order currencies; mixed-currency amounts should not be interpreted as USD.
     columns:
       - name: product_id
-        tests:
-          - unique
-          - not_null
+        description: Product master key and reporting grain.
+        tests: [unique, not_null]
+      - name: product_name
+        description: Current product display name.
+      - name: category_id
+        description: Current product category.
+      - name: net_revenue
+        description: Line revenue after line discounts only; no header discount allocation or currency normalization.
+      - name: units_sold
+        description: Total qualifying line quantity.
+      - name: first_order_date
+        description: Earliest qualifying order date for this product.
+      - name: last_order_date
+        description: Latest qualifying order date for this product.
 
   - name: fct_sales_journal_lines
-    description: Generated sales journal lines in USD, replacing fin.usp_GenerateSalesJournal for analytics.
+    description: >
+      One generated journal line per date, SALES source, and GL account, excluding zero
+      lines. Sales amounts are converted to USD; COGS uses base-currency product cost.
+      Analytical replacement for fin.usp_GenerateSalesJournal, not a posted ledger.
+      Rounding differences flow to suspense account 9999. Returns are not generated.
     columns:
       - name: journal_line_key
-        tests:
-          - unique
-          - not_null
+        description: Hash of date, source, account, debit, and credit; changes when amounts change.
+        tests: [unique, not_null]
       - name: entry_date
-        tests:
-          - not_null
+        description: Order date of the daily sales journal.
+        tests: [not_null]
+      - name: source
+        description: SALES for generated sales journals.
+      - name: description
+        description: Daily sales journal display label.
+      - name: gl_account_id
+        description: Account master key; every generated account must exist.
+        tests: [not_null]
       - name: account_code
+        description: Ledger account code for receivables, revenue, tax, suspense, COGS, or inventory.
         tests:
           - not_null
+          - relationships:
+              arguments: {to: "ref('stg_gl_accounts')", field: account_code}
+      - name: debit_amount
+        description: Debit amount in USD, zero for credit-only lines.
+      - name: credit_amount
+        description: Credit amount in USD, zero for debit-only lines.
 
   - name: fct_journal_balance
-    description: Journal balance check by entry date and source.
+    description: One row per entry date and source, reconciling generated journal debit and credit totals within 0.005 USD.
     columns:
       - name: entry_date
-        tests:
-          - not_null
+        description: Journal date; part of the composite grain.
+        tests: [not_null]
       - name: source
-        tests:
-          - not_null
+        description: Journal source; part of the composite grain.
+        tests: [not_null]
+      - name: debit_amount
+        description: Total USD debits for the date and source.
+      - name: credit_amount
+        description: Total USD credits for the date and source.
+      - name: variance_amount
+        description: Rounded debits less credits in USD.
       - name: is_balanced
+        description: True when absolute rounded variance is at most 0.005 USD.
         tests:
           - accepted_values:
-              arguments:
-                values: [true]
+              arguments: {values: [true]}

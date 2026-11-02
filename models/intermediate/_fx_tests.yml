@@ -1,0 +1,45 @@
+version: 2
+
+unit_tests:
+  - name: fx_feed_overwrites_reference_and_preserves_inverse_priority
+    description: Feed corrections override reference rates even when lower; inverse candidates remain distinguishable from direct rates.
+    model: int_fx_rates
+    given:
+      - input: ref('stg_ref_fx_rates')
+        rows:
+          - {from_currency: EUR, to_currency: USD, rate_date: '2025-01-01', rate: 1.2}
+      - input: ref('stg_raw_fx_rates')
+        rows:
+          - {from_currency: EUR, to_currency: USD, rate_date: '2025-01-01', rate: 1.1}
+          - {from_currency: GBP, to_currency: USD, rate_date: null, rate: 1.3}
+          - {from_currency: CAD, to_currency: USD, rate_date: '2025-01-01', rate: null}
+    expect:
+      rows:
+        - {from_currency: EUR, to_currency: USD, rate_date: '2025-01-01', rate: 1.1, rate_priority: 0}
+        - {from_currency: USD, to_currency: EUR, rate_date: '2025-01-01', rate: 0.9090909091, rate_priority: 1}
+
+  - name: usd_rates_use_direct_then_inverse_then_passthrough
+    description: Older direct rates beat newer inverse candidates; future rates are excluded; USD and missing pairs use one.
+    model: int_order_usd_rates
+    given:
+      - input: ref('fct_orders')
+        rows:
+          - {order_id: 1, currency_code: EUR, order_date: '2025-01-15'}
+          - {order_id: 2, currency_code: GBP, order_date: '2025-01-15'}
+          - {order_id: 3, currency_code: CAD, order_date: '2025-01-15'}
+          - {order_id: 4, currency_code: USD, order_date: '2025-01-15'}
+          - {order_id: 5, currency_code: JPY, order_date: '2025-01-15'}
+      - input: ref('int_fx_rates')
+        rows:
+          - {from_currency: EUR, to_currency: USD, rate_date: '2025-01-01', rate: 1.1, rate_priority: 0}
+          - {from_currency: EUR, to_currency: USD, rate_date: '2025-01-10', rate: 1.2, rate_priority: 1}
+          - {from_currency: EUR, to_currency: USD, rate_date: '2025-02-01', rate: 1.3, rate_priority: 0}
+          - {from_currency: GBP, to_currency: USD, rate_date: '2025-01-10', rate: 1.25, rate_priority: 1}
+          - {from_currency: CAD, to_currency: USD, rate_date: '2025-02-01', rate: 0.75, rate_priority: 0}
+    expect:
+      rows:
+        - {order_id: 1, usd_rate: 1.1}
+        - {order_id: 2, usd_rate: 1.25}
+        - {order_id: 3, usd_rate: 1}
+        - {order_id: 4, usd_rate: 1}
+        - {order_id: 5, usd_rate: 1}
