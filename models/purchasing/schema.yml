@@ -1,0 +1,132 @@
+version: 2
+
+models:
+  - name: int_stock_availability
+    description: >-
+      Current stock availability at one row per warehouse and product, implementing
+      the live-stock branch of rpt.usp_LowStockReport. Available quantity is on-hand
+      minus allocated stock. A product is below reorder when available plus on-order
+      quantity is less than or equal to its reorder point. Missing reorder points
+      default to 10, matching this procedure rather than the configurable threshold
+      used by other inventory reports. Quantities are not clamped or defaulted.
+    data_tests:
+      - unique:
+          name: stock_availability_warehouse_product_unique
+          arguments:
+            column_name: "(warehouse_id::varchar || ':' || product_id::varchar)"
+    columns:
+      - name: warehouse_id
+        description: Warehouse holding the stock; part of the model's composite key.
+        data_tests: [not_null]
+      - name: product_id
+        description: Product held in the warehouse; part of the model's composite key.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_products')
+                field: product_id
+      - name: qty_on_hand
+        description: Physical units held before allocations are subtracted.
+        data_tests: [not_null]
+      - name: qty_allocated
+        description: Units reserved and therefore unavailable for new demand.
+        data_tests: [not_null]
+      - name: qty_on_order
+        description: Incoming units recorded in current stock levels; not recalculated from purchase orders.
+        data_tests: [not_null]
+      - name: reorder_point
+        description: Product/warehouse reorder threshold, defaulting to 10 only when the input is null.
+        data_tests: [not_null]
+      - name: qty_available
+        description: On-hand units minus allocated units; may be negative when stock is overallocated.
+        data_tests: [not_null]
+      - name: below_reorder
+        description: True when available plus on-order units are at or below the reorder point, including equality.
+        data_tests: [not_null]
+
+  - name: rpt_purchasing_low_stock
+    description: >-
+      Purchasing worklist at one row per warehouse and product requiring replenishment.
+      Migrates the live-stock branch of rpt.usp_LowStockReport and preserves its seven
+      output fields in snake_case. Products must exist in the product master; missing
+      suppliers are retained with a null supplier name. Includes all warehouses;
+      consumers filter warehouse_id and sort qty_available when querying. Built as a
+      replacement table from current stock inputs, with no historical snapshot branch,
+      purchase-order aggregation, transactional writes, or changes to existing reports.
+    data_tests:
+      - unique:
+          name: purchasing_low_stock_warehouse_product_unique
+          arguments:
+            column_name: "(warehouse_id::varchar || ':' || product_id::varchar)"
+    columns:
+      - name: warehouse_id
+        description: Warehouse requiring replenishment; filter this column to replace the procedure parameter.
+        data_tests: [not_null]
+      - name: product_id
+        description: Product requiring replenishment in this warehouse.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments:
+                to: ref('stg_products')
+                field: product_id
+      - name: sku
+        description: Product master stock-keeping unit for purchasing lookup.
+      - name: product_name
+        description: Product master display name.
+      - name: supplier_name
+        description: Supplier display name; null when no matching supplier exists, without dropping the product.
+      - name: qty_available
+        description: On-hand units minus allocated units; excludes incoming stock.
+        data_tests: [not_null]
+      - name: on_order
+        description: Incoming quantity copied from stock levels, matching the live-stock procedure branch.
+        data_tests: [not_null]
+
+unit_tests:
+  - name: stock_availability_reorder_boundaries
+    description: Covers equality, incoming stock, allocations, null thresholds, and negative availability.
+    model: int_stock_availability
+    given:
+      - input: ref('stg_stock_levels')
+        rows:
+          - {warehouse_id: 1, product_id: 101, qty_on_hand: 10, qty_allocated: 0, qty_on_order: 0, reorder_point: 10}
+          - {warehouse_id: 1, product_id: 102, qty_on_hand: 10, qty_allocated: 0, qty_on_order: 1, reorder_point: 10}
+          - {warehouse_id: 1, product_id: 103, qty_on_hand: 20, qty_allocated: 15, qty_on_order: 0, reorder_point: 10}
+          - {warehouse_id: 1, product_id: 104, qty_on_hand: 10, qty_allocated: 0, qty_on_order: 0, reorder_point: null}
+          - {warehouse_id: 1, product_id: 105, qty_on_hand: 11, qty_allocated: 0, qty_on_order: 0, reorder_point: null}
+          - {warehouse_id: 1, product_id: 106, qty_on_hand: 2, qty_allocated: 5, qty_on_order: 0, reorder_point: 0}
+    expect:
+      rows:
+        - {warehouse_id: 1, product_id: 101, qty_available: 10, reorder_point: 10, below_reorder: true}
+        - {warehouse_id: 1, product_id: 102, qty_available: 10, reorder_point: 10, below_reorder: false}
+        - {warehouse_id: 1, product_id: 103, qty_available: 5, reorder_point: 10, below_reorder: true}
+        - {warehouse_id: 1, product_id: 104, qty_available: 10, reorder_point: 10, below_reorder: true}
+        - {warehouse_id: 1, product_id: 105, qty_available: 11, reorder_point: 10, below_reorder: false}
+        - {warehouse_id: 1, product_id: 106, qty_available: -3, reorder_point: 0, below_reorder: true}
+
+  - name: purchasing_low_stock_filters_and_supplier_join
+    description: Keeps low-stock products across warehouses, retains missing suppliers, and matches the legacy inner product join.
+    model: rpt_purchasing_low_stock
+    given:
+      - input: ref('int_stock_availability')
+        rows:
+          - {warehouse_id: 1, product_id: 101, qty_available: 5, qty_on_order: 2, below_reorder: true}
+          - {warehouse_id: 1, product_id: 102, qty_available: 20, qty_on_order: 0, below_reorder: false}
+          - {warehouse_id: 1, product_id: 103, qty_available: 3, qty_on_order: 0, below_reorder: true}
+          - {warehouse_id: 1, product_id: 999, qty_available: 1, qty_on_order: 0, below_reorder: true}
+          - {warehouse_id: 2, product_id: 101, qty_available: 4, qty_on_order: 1, below_reorder: true}
+      - input: ref('stg_products')
+        rows:
+          - {product_id: 101, sku: 'SKU-101', product_name: 'Stock item', supplier_id: 501}
+          - {product_id: 102, sku: 'SKU-102', product_name: 'Covered item', supplier_id: 501}
+          - {product_id: 103, sku: 'SKU-103', product_name: 'Unassigned item', supplier_id: 999}
+      - input: ref('stg_suppliers')
+        rows:
+          - {supplier_id: 501, supplier_name: 'Primary supplier'}
+    expect:
+      rows:
+        - {warehouse_id: 1, product_id: 101, sku: 'SKU-101', product_name: 'Stock item', supplier_name: 'Primary supplier', qty_available: 5, on_order: 2}
+        - {warehouse_id: 1, product_id: 103, sku: 'SKU-103', product_name: 'Unassigned item', supplier_name: null, qty_available: 3, on_order: 0}
+        - {warehouse_id: 2, product_id: 101, sku: 'SKU-101', product_name: 'Stock item', supplier_name: 'Primary supplier', qty_available: 4, on_order: 1}
