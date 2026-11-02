@@ -1,0 +1,133 @@
+version: 2
+
+models:
+  - name: fct_loyalty_accruals
+    description: >
+      Potential earned loyalty points: one row per reconstructed order with nonzero
+      points. Migrates only the EARN calculation from dbo.usp_AccrueLoyalty.
+      Uses floor(greatest(subtotal - discount_total, 0) * points_rate); missing,
+      null, or invalid loyalty.points.per.currency.unit config defaults to 1.
+      Tax and shipping are excluded, and amounts stay in the order currency without
+      FX conversion, matching the procedure. A valid zero or negative configured
+      rate is preserved, matching the legacy procedure.
+      All fct_orders rows are evaluated: these are potential accruals, not evidence
+      of shipment or awarded points. The original workflow calls the procedure on
+      shipment, but fct_orders currently reconstructs orders as CONFIRMED and has
+      no shipment events. Return clawbacks (the REDEEM branch), account creation,
+      balance updates, and tier recalculation are out of scope; refund inputs are
+      not present in this project. Do not add these points to existing account
+      balances, which may already include historical awards.
+      Materialized as a full-rebuild table, so reruns do not append duplicates;
+      changes to the current configured rate restate all calculated history.
+      Build this pipeline with dbt build --select +fct_loyalty_accruals+.
+    columns:
+      - name: order_id
+        description: Analytical order key; inherited rank-derived IDs may shift after upstream rebuilds.
+        data_tests:
+          - unique
+          - not_null
+          - relationships:
+              arguments: {to: "ref('fct_orders')", field: order_id}
+      - name: external_order_ref
+        description: Feed business key identifying the order across analytical ID rebuilds.
+        data_tests: [unique, not_null]
+      - name: customer_id
+        description: Customer associated with the order; no operational loyalty account is created.
+        data_tests:
+          - not_null
+          - relationships:
+              arguments: {to: "ref('int_customer_master')", field: customer_id}
+      - name: order_date
+        description: Order date, not the shipment date or actual points-award timestamp.
+        data_tests: [not_null]
+      - name: currency_code
+        description: Original order currency used for net_amount; no currency normalization is applied.
+        data_tests: [not_null]
+      - name: net_amount
+        description: Subtotal less header discount, floored at zero; excludes tax and shipping.
+        data_tests: [not_null]
+      - name: points_rate
+        description: Current configured points per original-currency unit, cast to six decimal places; defaults to 1.
+        data_tests: [not_null]
+      - name: points
+        description: Integer floor of net_amount times points_rate; zero-point rows are omitted.
+        data_tests: [not_null]
+      - name: txn_type
+        description: EARN for the supported calculation branch; this is not a posted loyalty transaction.
+        data_tests:
+          - not_null
+          - accepted_values:
+              arguments: {values: ['EARN']}
+
+unit_tests:
+  - name: loyalty_accruals_apply_rate_and_floor_each_order
+    description: Apply the configured rate to net-of-discount amounts and round down per order.
+    model: fct_loyalty_accruals
+    given:
+      - input: ref('fct_orders')
+        rows:
+          - {order_id: 1, external_order_ref: A, customer_id: 10, order_date: '2026-01-01', currency_code: USD, subtotal: 10.99, discount_total: 1}
+          - {order_id: 2, external_order_ref: B, customer_id: 10, order_date: '2026-01-01', currency_code: GBP, subtotal: 3.5, discount_total: 0}
+      - input: ref('stg_config_param')
+        rows:
+          - {param_key: loyalty.points.per.currency.unit, param_value: '1.5'}
+          - {param_key: unrelated.setting, param_value: '100'}
+    expect:
+      rows:
+        - {order_id: 1, net_amount: 9.99, points_rate: 1.5, points: 14, txn_type: EARN}
+        - {order_id: 2, net_amount: 3.5, points_rate: 1.5, points: 5, txn_type: EARN}
+
+  - name: loyalty_accruals_omit_zero_points_and_clamp_negative_net
+    description: Negative or zero net amounts and positive amounts below one point produce no transaction.
+    model: fct_loyalty_accruals
+    given:
+      - input: ref('fct_orders')
+        rows:
+          - {order_id: 1, subtotal: 10, discount_total: 20}
+          - {order_id: 2, subtotal: 10, discount_total: 10}
+          - {order_id: 3, subtotal: 0.99, discount_total: 0}
+      - input: ref('stg_config_param')
+        rows:
+          - {param_key: loyalty.points.per.currency.unit, param_value: '1'}
+    expect:
+      rows: []
+
+  - name: loyalty_accruals_default_missing_rate
+    description: Missing config still yields an accrual using one point per currency unit.
+    model: fct_loyalty_accruals
+    given:
+      - input: ref('fct_orders')
+        rows:
+          - {order_id: 1, subtotal: 12.99, discount_total: 2}
+      - input: ref('stg_config_param')
+        rows: []
+    expect:
+      rows:
+        - {order_id: 1, points_rate: 1, points: 10}
+
+  - name: loyalty_accruals_default_invalid_rate
+    description: Non-numeric config uses the legacy default rate of one.
+    model: fct_loyalty_accruals
+    given:
+      - input: ref('fct_orders')
+        rows:
+          - {order_id: 1, subtotal: 12.99, discount_total: 2}
+      - input: ref('stg_config_param')
+        rows:
+          - {param_key: loyalty.points.per.currency.unit, param_value: invalid}
+    expect:
+      rows:
+        - {order_id: 1, points_rate: 1, points: 10}
+
+  - name: loyalty_accruals_preserve_zero_rate
+    description: A valid zero rate is not replaced with the default and produces no accruals.
+    model: fct_loyalty_accruals
+    given:
+      - input: ref('fct_orders')
+        rows:
+          - {order_id: 1, subtotal: 100, discount_total: 0}
+      - input: ref('stg_config_param')
+        rows:
+          - {param_key: loyalty.points.per.currency.unit, param_value: '0'}
+    expect:
+      rows: []
